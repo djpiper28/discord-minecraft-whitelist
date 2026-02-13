@@ -19,11 +19,9 @@ Health check server is on `:8080`
 
 ### 1 Register User
 
-```
-/mcadd <minecraft username>
-```
+The user will use the mcadd Discord command: `/mcadd <minecraft username>`.
 
-### 2 Verify User TODO
+### 2 Verify User
 
 The user joins the Miencraft Server, they will be kicked with a message showing a code.
 
@@ -33,20 +31,20 @@ Example Message:
 You need to verify your account, use /mcverify 123456
 ```
 
-### 3 User Verifies Themself TODO
+### 3 User Verifies Themself
 
-The user uses `/mcverify 123456`
+The user uses `/mcverify 123456` on Discord to verify themselves.
 
-### 4 The User Can Now Use The Server TODO
+### 4 The User Can Now Use The Server
 
-YAY!!!!!!!!!
+They should have no more issues using the server.
 
-## Banning A User TODO
+## Banning A User
 
 On Minecraft, or Discord a user can be `/mcban`ed, the user is then kicked and not allowed to join
 the Discord user and all of their alt accounts will be tagged as banned.
 
-## Unbanning A User TODO
+## Unbanning A User
 
 Users can be unbanned by `/mcunban`ing someone on the Discord Bot, they will have all alt accounts freed up.
 
@@ -54,7 +52,7 @@ Users can be unbanned by `/mcunban`ing someone on the Discord Bot, they will hav
 
 When a user leaves the discord server, they will be kicked from the Minecraft server, and have all their records deleted (GDPR or something like that I guess).
 
-## Logging TODO
+## Logging
 
 Users will have the following data logged:
 
