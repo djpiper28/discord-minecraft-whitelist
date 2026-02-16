@@ -1,4 +1,4 @@
-package com.github.djpiper28.discord.minecraft.whitelist.mixin.client;
+package com.github.djpiper28.discord.minecraft.whitelist.mixin.server;
 
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
-public class ExampleClientMixin {
+public class ServerMixin {
 	@Inject(at = @At("HEAD"), method = "run")
 	private void init(CallbackInfo info) {
 		// This code is injected into the start of Minecraft.run()V

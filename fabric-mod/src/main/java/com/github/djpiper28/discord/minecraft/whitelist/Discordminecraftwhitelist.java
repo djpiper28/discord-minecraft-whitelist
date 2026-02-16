@@ -19,6 +19,6 @@ public class Discordminecraftwhitelist implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("Loaded djpiper28's Discord Minecraft Whitelist mod.");
 	}
 }

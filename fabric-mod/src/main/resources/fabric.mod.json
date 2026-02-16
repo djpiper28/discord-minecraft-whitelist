@@ -3,13 +3,13 @@
 	"id": "discord-minecraft-whitelist",
 	"version": "${version}",
 	"name": "discord-minecraft-whitelist",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Server mod that allows a whitelist to be controlled from Discord.",
 	"authors": [
-		"Me!"
+		"djpiper28"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://github.com/djpiper28/discord-minecraft-whitelist",
+		"sources": "https://github.com/djpiper28/discord-minecraft-whitelist"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/discord-minecraft-whitelist/icon.png",
@@ -18,18 +18,15 @@
 		"main": [
 			"com.github.djpiper28.discord.minecraft.whitelist.Discordminecraftwhitelist"
 		],
-		"client": [
-			"com.github.djpiper28.discord.minecraft.whitelist.DiscordminecraftwhitelistClient"
-		],
-		"fabric-datagen": [
-			"com.github.djpiper28.discord.minecraft.whitelist.DiscordminecraftwhitelistDataGenerator"
+		"server": [
+			"com.github.djpiper28.discord.minecraft.whitelist.DiscordminecraftwhitelistServer"
 		]
 	},
 	"mixins": [
 		"discord-minecraft-whitelist.mixins.json",
 		{
-			"config": "discord-minecraft-whitelist.client.mixins.json",
-			"environment": "client"
+			"config": "discord-minecraft-whitelist.server.mixins.json",
+			"environment": "server"
 		}
 	],
 	"depends": {

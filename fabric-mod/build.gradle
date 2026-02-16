@@ -18,22 +18,28 @@ repositories {
 	// for more information about repositories.
 }
 
-loom {
-	splitEnvironmentSourceSets()
+sourceSets {
+	server {
+		java {
+			srcDirs = ["src/server/java"]
+		}
+		resources {
+			srcDirs = ["src/server/resources"]
+		}
+	}
+}
 
+loom {
 	mods {
 		"discord-minecraft-whitelist" {
 			sourceSet sourceSets.main
-			sourceSet sourceSets.client
+			sourceSet sourceSets.server
 		}
 	}
 
 }
 
 fabricApi {
-	configureDataGeneration {
-		client = true
-	}
 }
 
 dependencies {
