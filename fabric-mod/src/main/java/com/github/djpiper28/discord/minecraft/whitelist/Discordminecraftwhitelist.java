@@ -1,7 +1,6 @@
 package com.github.djpiper28.discord.minecraft.whitelist;
 
 import net.fabricmc.api.ModInitializer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

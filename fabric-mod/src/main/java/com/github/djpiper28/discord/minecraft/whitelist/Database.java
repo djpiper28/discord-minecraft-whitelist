@@ -3,7 +3,6 @@ package com.github.djpiper28.discord.minecraft.whitelist;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.net.InetAddress;
 import java.sql.*;
 import java.util.concurrent.atomic.AtomicReference;
