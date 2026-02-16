@@ -7,8 +7,6 @@ import java.net.InetAddress;
 import java.sql.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.djpiper28.discord.minecraft.whitelist.Discordminecraftwhitelist.LOGGER;
-
 /**
  * Accusations that this class comes from my year 2 group project are correct. I cannot be arsed to rewrite it.
  *
