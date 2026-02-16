@@ -48,6 +48,12 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+  // Server deps
+  modImplementation "io.github.cdimascio:dotenv-java:2.3.1"
+  modImplementation "com.google.guava:guava:31.1-jre"
+  modImplementation "org.postgresql:postgresql:42.5.1"
+  modImplementation "org.apache.commons:commons-dbcp2:2.9.0"
+
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	
