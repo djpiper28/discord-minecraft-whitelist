@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"runtime"
+	"time"
+
 	"github.com/Goscord/goscord"
 	"github.com/Goscord/goscord/discord"
 	"github.com/Goscord/goscord/gateway"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"os"
-	"runtime"
-	"time"
 )
 
 var db *gorm.DB
@@ -28,6 +29,10 @@ func main() {
 
 	// Setup database
 	databaseUrl := os.Getenv("DATABASE_URL")
+  if databaseUrl == "" {
+    log.Fatal("The DATABASE_URL has not been set.")
+  }
+
 	db, err = gorm.Open(postgres.Open(databaseUrl), &gorm.Config{}) // *gorm.DB
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +44,7 @@ func main() {
 	}
 
 	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetMaxOpenConns(20)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	log.Print("Migrating Database")

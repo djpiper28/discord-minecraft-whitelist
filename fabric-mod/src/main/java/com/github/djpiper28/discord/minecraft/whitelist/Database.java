@@ -37,10 +37,10 @@ public class Database {
         this.ds.setUrl(this.url);
         this.ds.setUsername(this.username);
         this.ds.setPassword(this.password);
-        this.ds.setMinIdle(20);
-        this.ds.setMaxIdle(100);
+        this.ds.setMinIdle(1);
+        this.ds.setMaxIdle(20);
+        this.ds.setMaxTotal(10);
         this.ds.setMaxOpenPreparedStatements(100);
-        this.ds.setMaxTotal(500);
     }
 
     /**
