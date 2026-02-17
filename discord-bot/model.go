@@ -61,17 +61,17 @@ type MinecraftUser struct {
 	Verified           bool
 }
 
-func reportMigrateError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func AutoMigrateModel() {
-	reportMigrateError(db.AutoMigrate(&MinecraftUser{},
-		&DiscordMinecraftUser{},
+	err := db.AutoMigrate(
 		&DiscordUser{},
-		&GuildSettings{}))
+		&MinecraftUser{},
+		&DiscordMinecraftUser{},
+		&GuildSettings{},
+	)
+
+	if err != nil {
+		log.Fatalf("Cannot migrate database: %w", err)
+	}
 }
 
 // Helper function to set IP addresses, probably won't be used lmao
