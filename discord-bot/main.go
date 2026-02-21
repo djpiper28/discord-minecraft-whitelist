@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"runtime"
+	"slices"
 	"time"
 
 	"github.com/Goscord/goscord"
@@ -62,6 +63,8 @@ func main() {
 		new(SetupCommand),
 		new(AddAccountCommand),
 		new(VerifyCommand),
+		new(BanCommand),
+		new(UnbanCommand),
 	}
 
 	// Create client instance
@@ -73,24 +76,25 @@ func main() {
 	// Setup events
 	err = client.On("ready", func() {
 		go func() {
-			slog.Info("Clearing old slash commands")
-			cmds, err := client.Application.GetCommands(client.Me().Id, "")
+			cmdNames := make([]string, 0)
+			slog.Info("Finding slash commands")
+			cmds, err := client.Application.GetCommands(client.Me().Id, os.Getenv(DISCORD_GUILD_ID))
 			if err != nil {
-				slog.Error("Cannot register slash command", "err", err)
+				slog.Error("Cannot find slash commands", "err", err)
 			} else {
-				for i := range cmds {
-					err = client.Application.DeleteCommand(client.Me().Id, "", cmds[i].Id)
-					if err != nil {
-						slog.Error("Cannot delete old slash command", err)
-					}
+				for _, cmd := range cmds {
+					cmdNames = append(cmdNames, cmd.Name)
 				}
 			}
 
 			slog.Info("Registering slash commands")
-			for i := range commandsList {
-				Register(commandsList[i], client, commands)
-				time.Sleep(time.Second)
+			for _, command := range commandsList {
+				if !slices.Contains(cmdNames, command.Name()) {
+					Register(command, client, commands)
+					time.Sleep(time.Second * 2)
+				}
 			}
+			slog.Info("All commands registered")
 		}()
 
 		slog.Info("Setting activity")
