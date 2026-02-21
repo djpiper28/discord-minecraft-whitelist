@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -33,7 +33,8 @@ type DiscordUser struct {
 	// This is a cache of whether or not the user has the admin role
 	HasAdminRole bool `gorm:"index"`
 	// This is whether the user and, all their accounts are banned
-	Banned                bool                   `gorm:"index"`
+	Banned                bool `gorm:"index"`
+	BanReason             string
 	DiscordUserID         string                 `gorm:"primaryKey"`
 	DiscordMinecraftUsers []DiscordMinecraftUser `gorm:"foreignKey:DiscordUserID"`
 	DisplayName           string
@@ -48,12 +49,13 @@ type DiscordMinecraftUser struct {
 
 type MinecraftUser struct {
 	Id uuid.UUID `gorm:"primaryKey"`
-	// Cached username, updated every time the user logs in to the server
+	// Cached username, updated every time the user slogs in to the server
 	Username           string
 	LastLoginTime      time.Time
 	LastX              float32
 	LastY              float32
 	LastZ              float32
+	LastDimension      string
 	LastIpAddress      pgtype.Inet `gorm:"type:inet"`
 	LastChunkImage     []byte
 	LastSkinImage      []byte
@@ -70,7 +72,8 @@ func AutoMigrateModel() {
 	)
 
 	if err != nil {
-		log.Fatalf("Cannot migrate database: %w", err)
+		slog.Error("Cannot migrate database", "err", err)
+		os.Exit(1)
 	}
 }
 
@@ -104,9 +107,9 @@ func Register(cmd Command, client *gateway.Session, commands map[string]Command)
 
 	_, err := client.Application.RegisterCommand(client.Me().Id, "", appCmd)
 	if err != nil {
-		log.Printf("Error registering command '%s' - %s", cmd.Name(), err)
+		slog.Info("Error registering command", "name", cmd.Name(), "err", err)
 	} else {
-		log.Printf("Registered command '%s'", cmd.Name())
+		slog.Info("Registered command", "name", cmd.Name())
 	}
 	commands[cmd.Name()] = cmd
 }
@@ -148,7 +151,7 @@ func SendWrongGuildError(ctx *Context) {
 }
 
 func SendInternalError(err error, ctx *Context) {
-	log.Print(err)
+	slog.Info("Internal error", "err", err)
 	SendError(fmt.Sprintf("An internal error has occurred:\n```\n%s\n```", err), ctx)
 }
 
@@ -159,7 +162,7 @@ func CheckGuild(ctx *Context) error {
 	guildid := ctx.interaction.GuildId
 	if guildid != requiredGuild {
 		SendWrongGuildError(ctx)
-		log.Printf("Guild %s is not the guild (%s).", guildid, requiredGuild)
+		slog.Info("Incorrect guild", "guild ID", guildid, "required guild ID", requiredGuild)
 		return errors.New("Wrong guild.")
 	}
 	return nil
@@ -181,7 +184,7 @@ func UserIsAdmin(gs GuildSettings, user *discord.GuildMember) bool {
 
 func UpdateDisplayName(tx *gorm.DB, user *discord.User) error {
 	if user == nil {
-		log.Print("User is nil")
+		slog.Info("User is nil")
 		// This is non-fatal as the bot may be misconfigured
 		return nil
 	}
@@ -195,20 +198,20 @@ func UpdateThread(client *gateway.Session) {
 	for {
 		guild, err := client.State().Guild(os.Getenv(DISCORD_GUILD_ID))
 		if err != nil {
-			log.Printf("Cannot find the DISCORD_GUILD_ID guild, %s.", err)
+			slog.Info("Cannot find the DISCORD_GUILD_ID guild", "err", err)
 			time.Sleep(time.Minute * 5)
 			continue
 		}
 
 		members := guild.Members
-		log.Printf("Updating member list with %d members", len(members))
+		slog.Info("Updating member list", "members", len(members))
 
 		for _, member := range members {
-			log.Printf("Updating member %s", member.User.Username)
+			slog.Info("Updating member", "member", member.User.Username)
 
 			err = UpdateDisplayName(db, member.User)
 			if err != nil {
-				log.Printf("Cannot update user %s in the database, %s", member.User.Username, err)
+				slog.Info("Cannot update user in the database", "discord ID", member.User.Id, "member", member.User.Username, "err", err)
 			}
 		}
 

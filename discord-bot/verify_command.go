@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log/slog"
+
 	"github.com/Goscord/goscord/discord"
 	"github.com/Goscord/goscord/discord/embed"
 	"gorm.io/gorm"
-	"log"
 )
 
 type VerifyCommand struct{}
@@ -161,7 +162,7 @@ func (c *VerifyCommand) Execute(ctx *Context) bool {
 		&discord.InteractionCallbackMessage{Embeds: []*embed.Embed{e.Embed()},
 			Flags: discord.MessageFlagUrgent})
 
-	log.Printf("<@%s> verifed Minecraft account %s", ctx.interaction.Member.User.Id, accountName)
+	slog.Info("Verifed Minecraft account", "discord ID", ctx.interaction.Member.User.Id, "name", accountName)
 
 	return true
 }

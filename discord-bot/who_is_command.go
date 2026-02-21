@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 
 	"github.com/Goscord/goscord/discord"
 	"github.com/Goscord/goscord/discord/embed"
@@ -105,7 +105,7 @@ func (c *WhoIsCommand) Execute(ctx *Context) bool {
 		ctx.interaction.Token,
 		&discord.InteractionCallbackMessage{Embeds: []*embed.Embed{e.Embed()},
 			Flags: discord.MessageFlagUrgent})
-	log.Printf("Data lookup for %s complete", minecraftUserName)
+	slog.Info("Data lookup for complete", "name", minecraftUserName)
 
 	return true
 }

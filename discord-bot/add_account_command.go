@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"math/rand"
 	"os"
 
@@ -198,6 +198,6 @@ Please join **%s** with this user to verify the account and, **use /mcverify wit
 		&discord.InteractionCallbackMessage{Embeds: []*embed.Embed{e.Embed()},
 			Flags: discord.MessageFlagUrgent})
 
-	log.Printf("<@%s> added user %s to the whitelist, it is not verified yet", ctx.interaction.Member.User.Id, accountName)
+	slog.Info("added user to the whitelist, it is not verified yet", "discord ID", ctx.interaction.Member.User.Id, "name", accountName)
 	return true
 }

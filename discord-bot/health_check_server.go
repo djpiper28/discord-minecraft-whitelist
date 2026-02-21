@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func HealthCheckServer() {
@@ -10,5 +11,6 @@ func HealthCheckServer() {
 		w.Write([]byte("ok"))
 	}))
 
-	log.Fatal("Cannot start health check server on :8080")
+	slog.Error("Cannot start health check server on :8080")
+	os.Exit(1)
 }

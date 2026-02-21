@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
+
 	"github.com/Goscord/goscord/discord"
 	"github.com/Goscord/goscord/discord/embed"
-	"log"
 )
 
 type PlayerInfoCommand struct{}
@@ -63,9 +64,10 @@ func (c *PlayerInfoCommand) Execute(ctx *Context) bool {
 	}
 
 	e := embed.NewEmbedBuilder()
-	message := fmt.Sprintf("<@%s>\nBanned: %t\nAdmin: %t\n",
+	message := fmt.Sprintf("<@%s>\nBanned: %t; %s\nAdmin: %t\n",
 		discordId,
 		discordUser.Banned,
+		discordUser.BanReason,
 		discordUser.HasAdminRole)
 
 	for _, user := range minecraftUsers {
@@ -74,13 +76,14 @@ func (c *PlayerInfoCommand) Execute(ctx *Context) bool {
 		if !user.Verified {
 			verificationStatus = "❌"
 		}
-		message += fmt.Sprintf("\n%s: `%s`\tlast logged in at <t:%d:f> at (%02f, %02f, %02f)\n",
+		message += fmt.Sprintf("\n%s: `%s`\tlast slogged in at <t:%d:f> at (%02f, %02f, %02f) in %s\n",
 			verificationStatus,
 			user.Username,
 			user.LastLoginTime.Unix(),
 			user.LastX,
 			user.LastY,
-			user.LastZ)
+			user.LastZ,
+			user.LastDimension)
 	}
 
 	e.SetTitle("Information About Player")
@@ -92,7 +95,7 @@ func (c *PlayerInfoCommand) Execute(ctx *Context) bool {
 		ctx.interaction.Token,
 		&discord.InteractionCallbackMessage{Embeds: []*embed.Embed{e.Embed()},
 			Flags: discord.MessageFlagUrgent})
-	log.Printf("Data lookup for <@%s> complete", discordId)
+	slog.Info("Data lookup for complete", "discord ID", discordId)
 
 	return true
 }

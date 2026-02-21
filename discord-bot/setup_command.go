@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
+
 	"github.com/Goscord/goscord/discord"
 	"github.com/Goscord/goscord/discord/embed"
 	"gorm.io/gorm"
-	"log"
 )
 
 type SetupCommand struct{}
@@ -133,6 +134,6 @@ func (c *SetupCommand) Execute(ctx *Context) bool {
 		&discord.InteractionCallbackMessage{Embeds: []*embed.Embed{e.Embed()},
 			Flags: discord.MessageFlagUrgent})
 
-	log.Printf("<@%s> changed the configuration, see discord for further details", ctx.interaction.Member.User.Id)
+	slog.Info("Changed the configuration, see discord for further details", "discord ID", ctx.interaction.Member.User.Id)
 	return true
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"runtime"
 	"time"
@@ -20,34 +20,36 @@ var db *gorm.DB
 func main() {
 	fmt.Printf(" -> Environment information: \"%s\"\n", runtime.Version())
 	fmt.Println("Please send above data in any bug reports or support queries.")
-	log.SetFlags(log.Llongfile | log.Ldate | log.Ltime | log.Lmicroseconds)
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Print("Cannot load a .env file, using normal env vars instead", err)
+		slog.Info("Cannot load a .env file, using normal env vars instead", err)
 	}
 
 	// Setup database
 	databaseUrl := os.Getenv("DATABASE_URL")
-  if databaseUrl == "" {
-    log.Fatal("The DATABASE_URL has not been set.")
-  }
+	if databaseUrl == "" {
+		slog.Error("The DATABASE_URL has not been set.")
+		os.Exit(1)
+	}
 
 	db, err = gorm.Open(postgres.Open(databaseUrl), &gorm.Config{}) // *gorm.DB
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Cannot open database", "err", err)
+		os.Exit(1)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Cannot use database", "err", err)
+		os.Exit(1)
 	}
 
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(20)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	log.Print("Migrating Database")
+	slog.Info("Migrating Database")
 	AutoMigrateModel()
 
 	// Setup commands map
@@ -70,33 +72,77 @@ func main() {
 
 	// Setup events
 	err = client.On("ready", func() {
-		log.Print("Clearing old slash commands")
-		cmds, err := client.Application.GetCommands(client.Me().Id, "")
-		if err != nil {
-			log.Print(err)
-		} else {
-			for i := range cmds {
-				err = client.Application.DeleteCommand(client.Me().Id, "", cmds[i].Id)
-				if err != nil {
-					log.Print(err)
+		go func() {
+			slog.Info("Clearing old slash commands")
+			cmds, err := client.Application.GetCommands(client.Me().Id, "")
+			if err != nil {
+				slog.Error("Cannot register slash command", "err", err)
+			} else {
+				for i := range cmds {
+					err = client.Application.DeleteCommand(client.Me().Id, "", cmds[i].Id)
+					if err != nil {
+						slog.Error("Cannot delete old slash command", err)
+					}
 				}
 			}
-		}
 
-		log.Print("Registering slash commands")
-		for i := range commandsList {
-			Register(commandsList[i], client, commands)
-			time.Sleep(time.Second)
-		}
+			slog.Info("Registering slash commands")
+			for i := range commandsList {
+				Register(commandsList[i], client, commands)
+				time.Sleep(time.Second)
+			}
+		}()
 
-		log.Print("Setting activity")
+		slog.Info("Setting activity")
 		err = client.SetActivity(&discord.Activity{Name: os.Getenv("MINECRAFT_IP"), Type: discord.ActivityListening})
 		if err != nil {
-			log.Print(err)
+			slog.Warn("Cannot set activity", "err", err)
 		}
+
+		// err = db.Transaction(func(tx *gorm.DB) error {
+		// 	slog.Info("Updating all players in current guilds")
+		// 	var discordUsers []DiscordUser
+		// 	err = tx.Model(&discordUsers).Find(&discordUsers).Error
+		// 	if err != nil {
+		// 		slog.Warn("Cannot get all users", "err", err)
+		// 		return err
+		// 	}
+		//
+		// 	members, found := client.State().Members()[os.Getenv(DISCORD_GUILD_ID)]
+		// 	if !found {
+		// 		slog.Warn("Cannot find guild")
+		// 	}
+		//
+		// 	for id := range members {
+		// 		for i, existingUser := range discordUsers {
+		// 			if existingUser.DiscordUserID == id {
+		// 				discordUsers = slices.Delete(discordUsers, i, i)
+		// 				break
+		// 			}
+		// 		}
+		// 	}
+		//
+		// 	for _, deletedUser := range discordUsers {
+		// 		err := tx.Model(&deletedUser).UpdateColumns(map[string]any{
+		// 			"banned":     true,
+		// 			"ban_reason": "Not in server",
+		// 		}).Error
+		// 		if err != nil {
+		// 			slog.Warn("Could not ban user for not being in the guild", "discord ID", deletedUser.DiscordUserID, "name", deletedUser.DisplayName, "err", err)
+		// 		} else {
+		// 			slog.Info("Banned user for not being in the guild", "discord ID", deletedUser.DiscordUserID, "name", deletedUser.DisplayName)
+		// 		}
+		// 	}
+		//
+		// 	return nil
+		// })
+		// if err != nil {
+		// 	slog.Warn("Could not check members on startup", "err", err)
+		// }
 	})
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Cannot execute onReady hook", "err", err)
+		os.Exit(1)
 	}
 
 	err = client.On("interactionCreate", func(interaction *discord.Interaction) {
@@ -113,21 +159,23 @@ func main() {
 		if cmd != nil {
 			success := cmd.Execute(&Context{client: client, interaction: interaction})
 			if !success {
-				log.Printf("Failed to run '%s' command", cmd.Name())
+				slog.Info("Failed to run command", "name", cmd.Name())
 			}
 		}
 	})
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Cannot run interactionCreat hook", "err", err)
+		os.Exit(1)
 	}
 
 	// Login client
 	if err := client.Login(); err != nil {
-		log.Fatal(err)
+		slog.Error("Cannot login client", "err", err)
+		os.Exit(1)
 	}
 
 	// Keep bot running
-	log.Print("Bot started")
+	slog.Info("Bot started")
 
 	go HealthCheckServer()
 	go UpdateThread(client)
