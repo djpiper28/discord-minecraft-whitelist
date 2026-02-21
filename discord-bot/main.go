@@ -103,46 +103,94 @@ func main() {
 			slog.Warn("Cannot set activity", "err", err)
 		}
 
-		// err = db.Transaction(func(tx *gorm.DB) error {
-		// 	slog.Info("Updating all players in current guilds")
-		// 	var discordUsers []DiscordUser
-		// 	err = tx.Model(&discordUsers).Find(&discordUsers).Error
-		// 	if err != nil {
-		// 		slog.Warn("Cannot get all users", "err", err)
-		// 		return err
-		// 	}
-		//
-		// 	members, found := client.State().Members()[os.Getenv(DISCORD_GUILD_ID)]
-		// 	if !found {
-		// 		slog.Warn("Cannot find guild")
-		// 	}
-		//
-		// 	for id := range members {
-		// 		for i, existingUser := range discordUsers {
-		// 			if existingUser.DiscordUserID == id {
-		// 				discordUsers = slices.Delete(discordUsers, i, i)
-		// 				break
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	for _, deletedUser := range discordUsers {
-		// 		err := tx.Model(&deletedUser).UpdateColumns(map[string]any{
-		// 			"banned":     true,
-		// 			"ban_reason": "Not in server",
-		// 		}).Error
-		// 		if err != nil {
-		// 			slog.Warn("Could not ban user for not being in the guild", "discord ID", deletedUser.DiscordUserID, "name", deletedUser.DisplayName, "err", err)
-		// 		} else {
-		// 			slog.Info("Banned user for not being in the guild", "discord ID", deletedUser.DiscordUserID, "name", deletedUser.DisplayName)
-		// 		}
-		// 	}
-		//
-		// 	return nil
-		// })
-		// if err != nil {
-		// 	slog.Warn("Could not check members on startup", "err", err)
-		// }
+		err = db.Transaction(func(tx *gorm.DB) error {
+			slog.Info("Updating all players in current guilds")
+			var settings GuildSettings
+			err = tx.Model(&settings).First(&settings).Error
+			if err != nil {
+				slog.Warn("Cannot get guild settings", "err", err)
+				return err
+			}
+
+			var discordUsers []DiscordUser
+			err = tx.Model(&discordUsers).Find(&discordUsers).Error
+			if err != nil {
+				slog.Warn("Cannot get all users", "err", err)
+				return err
+			}
+
+			members, found := client.State().Members()[os.Getenv(DISCORD_GUILD_ID)]
+			if !found {
+				slog.Warn("Cannot find guild - skipping user leave check")
+				return nil
+			}
+
+			noAccess := make([]string, 0)
+			leftServer := make([]string, 0)
+			for id, member := range members {
+				found := false
+
+				for i, existingUser := range discordUsers {
+					if existingUser.DiscordUserID == id {
+						found = true
+						canAccess := slices.Contains(member.Roles, settings.AccessRole)
+						if !canAccess {
+							noAccess = append(noAccess, member.User.Id)
+							break
+						}
+
+						discordUsers = slices.Delete(discordUsers, i, i)
+						isAdmin := slices.Contains(member.Roles, settings.AdminRole)
+						if existingUser.HasAdminRole != isAdmin {
+							slog.Info("Changing has admin role of user",
+								"discord ID", member.User.Id,
+								"name", member.User.Username,
+								"has admin", isAdmin,
+								"old has admin", existingUser.HasAdminRole)
+							err := tx.Model(&existingUser).Update("has_admin_role", isAdmin).Error
+							if err != nil {
+								slog.Error("Cannot set change HasAdminRole of player", "err", err)
+								return err
+							}
+						}
+						break
+					}
+				}
+
+				if !found {
+					leftServer = append(leftServer, member.User.Id)
+				}
+			}
+
+			for _, deletedUser := range leftServer {
+				err := tx.Model(&deletedUser).UpdateColumns(map[string]any{
+					"banned":     true,
+					"ban_reason": "Not in server",
+				}).Error
+				if err != nil {
+					slog.Warn("Could not ban user for not being in the guild", "discord ID", deletedUser, "err", err)
+				} else {
+					slog.Info("Banned user for not being in the guild", "discord ID", deletedUser)
+				}
+			}
+
+			for _, deletedUser := range noAccess {
+				err := tx.Model(&deletedUser).UpdateColumns(map[string]any{
+					"banned":     true,
+					"ban_reason": "Not in access group",
+				}).Error
+				if err != nil {
+					slog.Warn("Could not ban user for not having access role", "discord ID", deletedUser, "err", err)
+				} else {
+					slog.Info("Banned user for not having access role", "discord ID", deletedUser)
+				}
+			}
+
+			return nil
+		})
+		if err != nil {
+			slog.Warn("Could not check members on startup", "err", err)
+		}
 	})
 	if err != nil {
 		slog.Error("Cannot execute onReady hook", "err", err)
