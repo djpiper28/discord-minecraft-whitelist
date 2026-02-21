@@ -1,11 +1,11 @@
 {
-	"required": true,
-	"package": "com.github.djpiper28.discord.minecraft.whitelist.mixin.server",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-      "ServerMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "com.github.djpiper28.discord.minecraft.whitelist.mixin.server",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ServerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

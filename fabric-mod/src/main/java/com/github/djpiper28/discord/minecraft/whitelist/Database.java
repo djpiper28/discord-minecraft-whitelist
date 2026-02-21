@@ -3,6 +3,7 @@ package com.github.djpiper28.discord.minecraft.whitelist;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.sql.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -82,8 +83,8 @@ public class Database {
         this.runOnDatabase((conn) -> {
             try {
                 PreparedStatement updateStatement = conn.prepareStatement("UPDATE minecraft_users " +
-                    "SET last_x = ?, last_y = ?, last_z = ?, last_login_time = CURRENT_TIMESTAMP(2) " +
-                    "WHERE id = ?;");
+                        "SET last_x = ?, last_y = ?, last_z = ?, last_login_time = CURRENT_TIMESTAMP(2) " +
+                        "WHERE id = ?;");
                 updateStatement.setDouble(1, x);
                 updateStatement.setDouble(2, y);
                 updateStatement.setDouble(3, z);
@@ -118,9 +119,9 @@ public class Database {
                 PreparedStatement getMinecraftUserPs = conn.prepareStatement("SELECT * FROM minecraft_users WHERE id = ?;");
                 PreparedStatement updateMinecraftUsernameCache = conn.prepareStatement("UPDATE minecraft_users SET username = ? WHERE id = ?;");
                 PreparedStatement getBannedStatus = conn.prepareStatement("SELECT discord_users.banned " +
-                    "FROM discord_users " +
-                    "FULL OUTER JOIN discord_minecraft_users ON discord_users.discord_user_id = discord_minecraft_users.discord_user_id " +
-                    "WHERE discord_minecraft_users.minecraft_user_id = ?;");
+                        "FROM discord_users " +
+                        "FULL OUTER JOIN discord_minecraft_users ON discord_users.discord_user_id = discord_minecraft_users.discord_user_id " +
+                        "WHERE discord_minecraft_users.minecraft_user_id = ?;");
 
                 getMinecraftUserPs.setString(1, id);
                 ResultSet res = getMinecraftUserPs.executeQuery();
@@ -136,10 +137,10 @@ public class Database {
                 }
 
                 final MinecraftUser user = new MinecraftUser(res.getString("id"),
-                    res.getString("username"),
-                    res.getInt("verification_number"),
-                    banned,
-                    res.getBoolean("verified"));
+                        res.getString("username"),
+                        res.getInt("verification_number"),
+                        banned,
+                        res.getBoolean("verified"));
 
                 if (!user.getUsername().equals(username)) {
                     System.out.println("Updating the username in the cache");

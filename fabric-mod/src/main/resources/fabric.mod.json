@@ -1,38 +1,38 @@
 {
-	"schemaVersion": 1,
-	"id": "discord-minecraft-whitelist",
-	"version": "${version}",
-	"name": "discord-minecraft-whitelist",
-	"description": "Server mod that allows a whitelist to be controlled from Discord.",
-	"authors": [
-		"djpiper28"
-	],
-	"contact": {
-		"homepage": "https://github.com/djpiper28/discord-minecraft-whitelist",
-		"sources": "https://github.com/djpiper28/discord-minecraft-whitelist"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/discord-minecraft-whitelist/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.github.djpiper28.discord.minecraft.whitelist.Discordminecraftwhitelist"
-		],
-		"server": [
-			"com.github.djpiper28.discord.minecraft.whitelist.DiscordminecraftwhitelistServer"
-		]
-	},
-	"mixins": [
-		"discord-minecraft-whitelist.mixins.json",
-		{
-			"config": "discord-minecraft-whitelist.server.mixins.json",
-			"environment": "server"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.18.4",
-		"minecraft": "~1.21.1",
-		"java": ">=21",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "discord-minecraft-whitelist",
+  "version": "${version}",
+  "name": "discord-minecraft-whitelist",
+  "description": "Server mod that allows a whitelist to be controlled from Discord.",
+  "authors": [
+    "djpiper28"
+  ],
+  "contact": {
+    "homepage": "https://github.com/djpiper28/discord-minecraft-whitelist",
+    "sources": "https://github.com/djpiper28/discord-minecraft-whitelist"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/discord-minecraft-whitelist/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.github.djpiper28.discord.minecraft.whitelist.Discordminecraftwhitelist"
+    ],
+    "server": [
+      "com.github.djpiper28.discord.minecraft.whitelist.DiscordminecraftwhitelistServer"
+    ]
+  },
+  "mixins": [
+    "discord-minecraft-whitelist.mixins.json",
+    {
+      "config": "discord-minecraft-whitelist.server.mixins.json",
+      "environment": "server"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
 }
