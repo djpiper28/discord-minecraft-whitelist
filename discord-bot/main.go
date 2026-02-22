@@ -127,11 +127,11 @@ func main() {
 
 			noAccess := make([]string, 0)
 			leftServer := make([]string, 0)
-			for id, member := range members {
+			for _, existingUser := range discordUsers {
 				found := false
 
-				for i, existingUser := range discordUsers {
-					if existingUser.DiscordUserID == id {
+				for _, member := range members {
+					if existingUser.DiscordUserID == member.User.Id {
 						found = true
 						canAccess := slices.Contains(member.Roles, settings.AccessRole)
 						if !canAccess {
@@ -139,7 +139,14 @@ func main() {
 							break
 						}
 
-						discordUsers = slices.Delete(discordUsers, i, i)
+						if existingUser.DisplayName != member.User.Username {
+							slog.Info("Updating the username of a user", "discord ID", member.User.Id, "new name", member.User.Username, "old name", existingUser.DisplayName)
+							err := tx.Model(&existingUser).Update("display_name", member.User.Username).Error
+							if err != nil {
+								slog.Error("Cannot update the username of player", "err", err, "discord ID", member.User.Id)
+							}
+						}
+
 						isAdmin := slices.Contains(member.Roles, settings.AdminRole)
 						if existingUser.HasAdminRole != isAdmin {
 							slog.Info("Changing has admin role of user",
@@ -149,7 +156,7 @@ func main() {
 								"old has admin", existingUser.HasAdminRole)
 							err := tx.Model(&existingUser).Update("has_admin_role", isAdmin).Error
 							if err != nil {
-								slog.Error("Cannot set change HasAdminRole of player", "err", err)
+								slog.Error("Cannot change HasAdminRole of player", "err", err, "discord ID", member.User.Id)
 								return err
 							}
 						}
@@ -158,7 +165,7 @@ func main() {
 				}
 
 				if !found {
-					leftServer = append(leftServer, member.User.Id)
+					leftServer = append(leftServer, existingUser.DiscordUserID)
 				}
 			}
 
