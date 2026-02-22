@@ -23,9 +23,8 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
                     .ignoreIfMissing()
                     .load();
         } catch (RuntimeException ex) {
-            ex.printStackTrace();
             Discordminecraftwhitelist.LOGGER.error(".env file is missing, see ../README.md");
-            System.exit(1);
+            throw new RuntimeException(e);
         }
 
         final String db_url = dotenv.get("DB_URL"),
@@ -33,7 +32,13 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
                 password = dotenv.get("DB_PASSWORD");
 
         Discordminecraftwhitelist.LOGGER.info("Connecting to the database...");
-        final Database database = new Database(db_url, username, password);
+        final Database database;
+        try {
+            database = new Database(db_url, username, password);
+        } catch (SQLException e) {
+            Discordminecraftwhitelist.LOGGER.error("Cannot connect to the database");
+            throw new RuntimeException(e);
+        }
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var player = handler.getPlayer();
