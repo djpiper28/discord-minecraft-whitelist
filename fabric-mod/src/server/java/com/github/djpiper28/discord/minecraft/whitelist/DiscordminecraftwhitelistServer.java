@@ -24,8 +24,8 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
                     .ignoreIfMissing()
                     .load();
         } catch (RuntimeException ex) {
-            Discordminecraftwhitelist.LOGGER.error(".env file is missing, see ../README.md");
-            throw new RuntimeException(e);
+            Discordminecraftwhitelist.LOGGER.error("Cannot load env vars", ex);
+            throw new RuntimeException(ex);
         }
 
         final String db_url = dotenv.get("DB_URL"),

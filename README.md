@@ -22,7 +22,7 @@ DB_USERNAME=user
 DB_PASSWORD=pass
 ```
 
-> Note that it will not work with environment variables.
+> Note that it will also work with environment variables.
 
 ## Discord Bot
 
