@@ -4,7 +4,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Pose;
 
 import java.sql.SQLException;
 
