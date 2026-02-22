@@ -4,6 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Pose;
 
 import java.sql.SQLException;
 
@@ -66,6 +67,14 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
             } catch (SQLException e) {
                 Discordminecraftwhitelist.LOGGER.info("Cannot check player {} due to an error {}", player.getName().getString(), e.toString());
                 player.connection.disconnect(Component.literal(String.format("Cannot connect due to internal error %s. Please try again.", e.toString())));
+            }
+
+            try {
+                database.updateMinecraftUserLastAccessDetails(player.getIpAddress(),
+                        player.getX(), player.getY(), player.getZ(), player.serverLevel().dimension().location().getPath(),
+                        player.getId()+"");
+            } catch (SQLException e) {
+                Discordminecraftwhitelist.LOGGER.warn("Could not update the last access information for the player", e);
             }
         });
 

@@ -78,17 +78,20 @@ public class Database {
         return ex != null;
     }
 
-    public void updateMinecraftUserLastAccessDetails(InetAddress ipaddr, double x, double y, double z, String id) throws SQLException {
+    public void updateMinecraftUserLastAccessDetails(String ipaddr, double x, double y, double z, String dimension, String id) throws SQLException {
         AtomicReference<SQLException> ex = new AtomicReference<>();
         this.runOnDatabase((conn) -> {
             try {
                 PreparedStatement updateStatement = conn.prepareStatement("UPDATE minecraft_users " +
-                        "SET last_x = ?, last_y = ?, last_z = ?, last_login_time = CURRENT_TIMESTAMP(2) " +
+                        "SET last_x = ?, last_y = ?, last_z = ?, last_ip_address = ?, last_dimension = ?, " +
+                        "last_login_time = CURRENT_TIMESTAMP(2) " +
                         "WHERE id = ?;");
                 updateStatement.setDouble(1, x);
                 updateStatement.setDouble(2, y);
                 updateStatement.setDouble(3, z);
-                updateStatement.setString(4, id);
+                updateStatement.setString(4, ipaddr);
+                updateStatement.setString(5, dimension);
+                updateStatement.setString(6, id);
 
                 updateStatement.executeUpdate();
             } catch (SQLException e) {
