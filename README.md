@@ -2,6 +2,28 @@
 
 mc server bot and, plugin to allow for a compsoc whitelist
 
+## Minecraft Server
+
+(The same for Fabric and the deprecated Paper plugin).
+
+Create a file called `.env` in your server directory with the following environment variables defined:
+
+| Env Var     | Description                              |
+| ----------- | ---------------------------------------- |
+| DB_URL      | Database URL in for of JDBC Postgres URL |
+| DB_USERNAME | Database username                        |
+| DB_PASSWORD | Database password                        |
+
+### Example `.env` file
+
+```bash
+DB_URL=jdbc:postgresql://localhost/database
+DB_USERNAME=user
+DB_PASSWORD=pass
+```
+
+> Note that it will not work with environment variables.
+
 ## Discord Bot
 
 Env vars:

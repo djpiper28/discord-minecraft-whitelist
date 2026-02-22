@@ -140,6 +140,7 @@ public class Database {
                         res.getString("username"),
                         res.getInt("verification_number"),
                         banned,
+                        res.getString("ban_reason"),
                         res.getBoolean("verified"));
 
                 if (!user.getUsername().equals(username)) {

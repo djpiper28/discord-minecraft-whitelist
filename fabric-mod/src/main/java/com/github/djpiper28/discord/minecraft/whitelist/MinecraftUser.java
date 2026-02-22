@@ -5,13 +5,15 @@ public class MinecraftUser {
     private final String username;
     private final int verificationNumber;
     private final boolean banned;
+    private final String banReason;
     private final boolean verified;
 
-    public MinecraftUser(final String id, final String username, final int verificationNumber, final boolean banned, final boolean verified) {
+    public MinecraftUser(final String id, final String username, final int verificationNumber, final boolean banned, final String banReason, final boolean verified) {
         this.id = id;
         this.username = username;
         this.verificationNumber = verificationNumber;
         this.banned = banned;
+        this.banReason = banReason;
         this.verified = verified;
     }
 
@@ -29,6 +31,10 @@ public class MinecraftUser {
 
     public boolean isBanned() {
         return banned;
+    }
+
+    public String banReason() {
+        return this.banReason;
     }
 
     public boolean getVerified() {
