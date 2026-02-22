@@ -69,8 +69,10 @@ func (c *AddAccountCommand) Execute(ctx *Context) bool {
 		}
 
 		// Check for access role
-		if !Contains(ctx.interaction.Member.Roles, gs.AccessRole) {
-			return errors.New(fmt.Sprintf("Invalid Permissions - you require the role <@&%s> to use this command.", gs.AccessRole))
+		if gs.AccessRole != "" {
+			if !Contains(ctx.interaction.Member.Roles, gs.AccessRole) {
+				return errors.New(fmt.Sprintf("Invalid Permissions - you require the role <@&%s> to use this command.", gs.AccessRole))
+			}
 		}
 
 		// Create the entries
