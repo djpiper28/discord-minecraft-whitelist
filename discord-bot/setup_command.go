@@ -34,7 +34,7 @@ func (c *SetupCommand) Options() []*discord.ApplicationCommandOption {
 		{
 			Type:        discord.ApplicationCommandOptionString, //Role,
 			Name:        "access",
-			Description: "The role for people who can use the minecraft server.",
+			Description: "The role for people who can use the minecraft server. Set to - to disable",
 			Required:    true,
 		},
 		{
