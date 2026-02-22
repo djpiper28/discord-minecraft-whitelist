@@ -64,7 +64,7 @@ func (c *UnbanCommand) Execute(ctx *Context) bool {
 
 		return tx.Model(&discordUser).Updates(map[string]interface{}{
 			"Banned":    false,
-			"BanReason": "",
+			"BanReason": fmt.Sprintf("(before unban: %s)", discordUser.BanReason),
 		}).Error
 	})
 
