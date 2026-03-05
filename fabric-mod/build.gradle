@@ -20,24 +20,17 @@ repositories {
 }
 
 sourceSets {
-    server {
+    main {
         java {
-            srcDirs = ["src/server/java"]
+            srcDirs += ["src/server/java"]
         }
         resources {
-            srcDirs = ["src/server/resources"]
+            srcDirs += ["src/server/resources"]
         }
     }
 }
 
 loom {
-    mods {
-        "discord-minecraft-whitelist" {
-            sourceSet sourceSets.main
-            sourceSet sourceSets.server
-        }
-    }
-
 }
 
 fabricApi {
@@ -53,6 +46,8 @@ dependencies {
     modImplementation include("io.github.cdimascio:dotenv-java:2.3.1")
     modImplementation include("org.postgresql:postgresql:42.5.1")
     modImplementation include("org.apache.commons:commons-dbcp2:2.9.0")
+    modImplementation include("org.apache.commons:commons-pool2:2.11.1")
+    modImplementation include("commons-logging:commons-logging:1.2")
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
@@ -68,7 +63,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 17
 }
 
 java {

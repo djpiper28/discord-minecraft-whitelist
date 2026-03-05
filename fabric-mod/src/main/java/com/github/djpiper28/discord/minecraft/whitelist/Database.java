@@ -53,17 +53,11 @@ public class Database {
      * @since 1
      */
     public boolean runOnDatabase(DatabaseRunnable runnable) throws SQLException {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
         Connection conn = null;
         RuntimeException ex = null;
 
         try {
-            conn = DriverManager.getConnection(this.url, this.username, this.password);
+            conn = this.ds.getConnection();
             conn.setAutoCommit(true);
             runnable.run(conn);
         } catch (RuntimeException e) {
