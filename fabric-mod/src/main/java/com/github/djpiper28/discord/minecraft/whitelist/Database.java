@@ -115,9 +115,9 @@ public class Database {
                 conn.setAutoCommit(false);
                 PreparedStatement getMinecraftUserPs = conn.prepareStatement("SELECT * FROM minecraft_users WHERE id = ?;");
                 PreparedStatement updateMinecraftUsernameCache = conn.prepareStatement("UPDATE minecraft_users SET username = ? WHERE id = ?;");
-                PreparedStatement getBannedStatus = conn.prepareStatement("SELECT discord_users.banned " +
+                PreparedStatement getBannedStatus = conn.prepareStatement("SELECT discord_users.banned, discord_users.ban_reason " +
                         "FROM discord_users " +
-                        "FULL OUTER JOIN discord_minecraft_users ON discord_users.discord_user_id = discord_minecraft_users.discord_user_id " +
+                        "JOIN discord_minecraft_users ON discord_users.discord_user_id = discord_minecraft_users.discord_user_id " +
                         "WHERE discord_minecraft_users.minecraft_user_id = ?;");
 
                 getMinecraftUserPs.setString(1, id);
@@ -157,15 +157,17 @@ public class Database {
                 getBannedStatus.setString(1, actualId);
                 ResultSet bannedStatus = getBannedStatus.executeQuery();
                 boolean banned = false;
+                String banReason = "";
                 if (bannedStatus.next()) {
-                    banned = bannedStatus.getBoolean(1);
+                    banned = bannedStatus.getBoolean("banned");
+                    banReason = bannedStatus.getString("ban_reason");
                 }
 
                 final MinecraftUser user = new MinecraftUser(res.getString("id"),
                         res.getString("username"),
                         res.getInt("verification_number"),
                         banned,
-                        res.getString("ban_reason"),
+                        banReason,
                         res.getBoolean("verified"));
 
                 if (user.getUsername() == null || !user.getUsername().trim().equals(username.trim())) {
