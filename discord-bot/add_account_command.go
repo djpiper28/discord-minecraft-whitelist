@@ -171,7 +171,7 @@ If this is in fault please contact <@&%s>`, gs.AdminRole))
 			return err
 		}
 
-		err = mdl.FirstOrCreate(&discordMinecraftUser, ctx.interaction.Member.User.Id).Error
+		err = mdl.FirstOrCreate(&discordMinecraftUser, ctx.interaction.User.Id).Error
 		if err != nil {
 			return err
 		}
