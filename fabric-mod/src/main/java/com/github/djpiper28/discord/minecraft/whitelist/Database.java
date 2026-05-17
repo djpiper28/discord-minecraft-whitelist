@@ -83,7 +83,7 @@ public class Database {
                 updateStatement.setDouble(1, x);
                 updateStatement.setDouble(2, y);
                 updateStatement.setDouble(3, z);
-                updateStatement.setString(4, ipaddr);
+                updateStatement.setObject(4, ipaddr, java.sql.Types.OTHER);
                 updateStatement.setString(5, dimension);
                 updateStatement.setString(6, id);
 
