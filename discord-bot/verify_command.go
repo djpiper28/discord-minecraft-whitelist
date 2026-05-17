@@ -135,7 +135,7 @@ func (c *VerifyCommand) Execute(ctx *Context) bool {
 
 		err = tx.Delete(&DiscordMinecraftUser{}, "minecraft_user_id = ? AND discord_user_id <> ?",
 			userLookup.Id,
-			ctx.interaction.User.Id).Error
+			ctx.interaction.Member.User.Id).Error
 		if err != nil {
 			return err
 		}
