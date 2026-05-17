@@ -141,7 +141,7 @@ If this is in fault please contact <@&%s>`, gs.AdminRole))
 		minecraftUser := MinecraftUser{
 			Id:            mcUser.Id,
 			Username:      mcUser.Name,
-			LastIpAddress: SetInet("0.0.0.0"),
+			LastIpAddress: "0.0.0.0",
 		}
 		mdl = tx.Model(&minecraftUser)
 		err = mdl.Error

@@ -56,7 +56,7 @@ type MinecraftUser struct {
 	LastY              float32
 	LastZ              float32
 	LastDimension      string
-	LastIpAddress      pgtype.Inet `gorm:"type:inet"`
+	LastIpAddress      string
 	LastChunkImage     []byte
 	LastSkinImage      []byte
 	VerificationNumber int64

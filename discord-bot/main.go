@@ -24,7 +24,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		slog.Info("Cannot load a .env file, using normal env vars instead", err)
+		slog.Info("Cannot load a .env file, using normal env vars instead", "err", err)
 	}
 
 	// Setup database

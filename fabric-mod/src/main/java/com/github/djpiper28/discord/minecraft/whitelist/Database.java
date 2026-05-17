@@ -77,13 +77,13 @@ public class Database {
         this.runOnDatabase((conn) -> {
             try {
                 PreparedStatement updateStatement = conn.prepareStatement("UPDATE minecraft_users " +
-                        "SET last_x = ?, last_y = ?, last_z = ?, last_ip_address = ?::inet, last_dimension = ?, " +
+                        "SET last_x = ?, last_y = ?, last_z = ?, last_ip_address, last_dimension = ?, " +
                         "last_login_time = CURRENT_TIMESTAMP(2) " +
                         "WHERE id = ?;");
                 updateStatement.setDouble(1, x);
                 updateStatement.setDouble(2, y);
                 updateStatement.setDouble(3, z);
-                updateStatement.setObject(4, ipaddr, java.sql.Types.OTHER);
+                updateStatement.setObject(4, ipaddr);
                 updateStatement.setString(5, dimension);
                 updateStatement.setString(6, id);
 
