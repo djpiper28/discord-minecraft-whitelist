@@ -77,13 +77,13 @@ public class Database {
         this.runOnDatabase((conn) -> {
             try {
                 PreparedStatement updateStatement = conn.prepareStatement("UPDATE minecraft_users " +
-                        "SET last_x = ?, last_y = ?, last_z = ?, last_ip_address, last_dimension = ?, " +
+                        "SET last_x = ?, last_y = ?, last_z = ?, last_ip_address = ?, last_dimension = ?, " +
                         "last_login_time = CURRENT_TIMESTAMP(2) " +
                         "WHERE id = ?;");
                 updateStatement.setDouble(1, x);
                 updateStatement.setDouble(2, y);
                 updateStatement.setDouble(3, z);
-                updateStatement.setObject(4, ipaddr);
+                updateStatement.setString(4, ipaddr);
                 updateStatement.setString(5, dimension);
                 updateStatement.setString(6, id);
 
@@ -123,7 +123,30 @@ public class Database {
                 getMinecraftUserPs.setString(1, id);
                 ResultSet res = getMinecraftUserPs.executeQuery();
                 if (!res.next()) {
-                    throw new UserNotFoundException();
+                    log.info("Player {} not found by UUID {}, trying username...", username, id);
+                    PreparedStatement getByUsernamePs = conn.prepareStatement("SELECT * FROM minecraft_users WHERE username = ?;");
+                    getByUsernamePs.setString(1, username);
+                    res = getByUsernamePs.executeQuery();
+
+                    if (!res.next()) {
+                        throw new UserNotFoundException();
+                    }
+
+                    String oldId = res.getString("id");
+                    log.warn("UUID mismatch for user {}: database has {}, server has {}. Updating database...", username, oldId, id);
+
+                    PreparedStatement updateDiscordMappingPs = conn.prepareStatement("UPDATE discord_minecraft_users SET minecraft_user_id = ? WHERE minecraft_user_id = ?;");
+                    updateDiscordMappingPs.setString(1, id);
+                    updateDiscordMappingPs.setString(2, oldId);
+                    updateDiscordMappingPs.executeUpdate();
+
+                    PreparedStatement updateIdPs = conn.prepareStatement("UPDATE minecraft_users SET id = ? WHERE id = ?;");
+                    updateIdPs.setString(1, id);
+                    updateIdPs.setString(2, oldId);
+                    updateIdPs.executeUpdate();
+
+                    // Re-fetch with new ID to ensure res is correctly positioned if needed, 
+                    // though we already have the data in res from the username lookup.
                 }
 
                 getBannedStatus.setString(1, id);
@@ -141,7 +164,7 @@ public class Database {
                         res.getBoolean("verified"));
 
                 if (!user.getUsername().equals(username)) {
-                    System.out.println("Updating the username in the cache");
+                    log.info("Updating the username in the cache for {}", id);
 
                     updateMinecraftUsernameCache.setString(1, username);
                     updateMinecraftUsernameCache.setString(2, id);

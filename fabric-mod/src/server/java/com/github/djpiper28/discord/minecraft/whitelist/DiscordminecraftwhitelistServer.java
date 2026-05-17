@@ -62,10 +62,12 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
                 Discordminecraftwhitelist.LOGGER.info("Player {} is allowed to join the server", player.getName().getString());
             } catch (UserNotFoundException e) {
                 Discordminecraftwhitelist.LOGGER.info("Player {} is not added - kicking with instructions", player.getName().getString());
-                player.connection.disconnect(Component.literal("You have not registered in the Discord server, us /mcadd in the Discord server."));
+                player.connection.disconnect(Component.literal("You have not registered in the Discord server, use /mcadd in the Discord server."));
+                return;
             } catch (SQLException e) {
                 Discordminecraftwhitelist.LOGGER.info("Cannot check player {} due to an error {}", player.getName().getString(), e.toString());
                 player.connection.disconnect(Component.literal(String.format("Cannot connect due to internal error %s. Please try again.", e.toString())));
+                return;
             }
 
             try {
