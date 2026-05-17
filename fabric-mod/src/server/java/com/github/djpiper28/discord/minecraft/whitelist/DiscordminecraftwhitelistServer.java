@@ -69,7 +69,15 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
             }
 
             try {
-                database.updateMinecraftUserLastAccessDetails(player.getIpAddress(),
+                String ip = player.getIpAddress();
+                if (ip.contains("/")) {
+                    ip = ip.substring(ip.lastIndexOf("/") + 1);
+                }
+                if (ip.contains(":")) {
+                    ip = ip.substring(0, ip.indexOf(":"));
+                }
+
+                database.updateMinecraftUserLastAccessDetails(ip,
                         player.getX(), player.getY(), player.getZ(), player.serverLevel().dimension().location().getPath(),
                         player.getId()+"");
             } catch (SQLException e) {
