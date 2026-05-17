@@ -154,8 +154,11 @@ If this is in fault please contact <@&%s>`, gs.AdminRole))
 			return err
 		}
 
-		// Update verification number
-		mdl.Updates(map[string]interface{}{"VerificationNumber": rand.Intn(MAX_VERIFCATION_NUMBER)})
+		// Update verification number and username
+		mdl.Updates(map[string]interface{}{
+			"VerificationNumber": rand.Intn(MAX_VERIFCATION_NUMBER),
+			"Username":           mcUser.Name,
+		})
 
 		// Add discord minecraft user
 		discordMinecraftUser := DiscordMinecraftUser{

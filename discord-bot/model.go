@@ -43,8 +43,8 @@ type DiscordUser struct {
 }
 
 type DiscordMinecraftUser struct {
-	DiscordUserID   string    `gorm:"foriegnKey:discord_user.discord_user_id,index,unique,composite:discord_minecraft_user"`
-	MinecraftUserID uuid.UUID `gorm:"foreignKey:minecraft_user.id,index,unique,composite:discord_minecraft_user"`
+	DiscordUserID   string    `gorm:"foreignKey:discord_user.discord_user_id,index,composite:discord_minecraft_user"`
+	MinecraftUserID uuid.UUID `gorm:"foreignKey:minecraft_user.id,index,composite:discord_minecraft_user"`
 }
 
 type MinecraftUser struct {
