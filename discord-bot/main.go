@@ -125,6 +125,11 @@ func main() {
 				return nil
 			}
 
+			if len(members) == 0 {
+				slog.Warn("Cannot list members of guild")
+				return nil
+			}
+
 			slog.Info("Checking guild members", "members", members)
 
 			noAccess := make([]string, 0)
