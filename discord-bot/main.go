@@ -125,6 +125,8 @@ func main() {
 				return nil
 			}
 
+			slog.Info("Checking guild members", "members", members)
+
 			noAccess := make([]string, 0)
 			leftServer := make([]string, 0)
 			for _, existingUser := range discordUsers {
