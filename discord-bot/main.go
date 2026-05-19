@@ -170,7 +170,7 @@ func main() {
 			}
 
 			for _, deletedUser := range leftServer {
-				err := tx.Model(&deletedUser).UpdateColumns(map[string]any{
+				err := tx.Model(&DiscordUser{}).UpdateColumns(map[string]any{
 					"banned":     true,
 					"ban_reason": "Not in server",
 				}).Error
@@ -182,7 +182,7 @@ func main() {
 			}
 
 			for _, deletedUser := range noAccess {
-				err := tx.Model(&deletedUser).UpdateColumns(map[string]any{
+				err := tx.Model(&DiscordUser{}).UpdateColumns(map[string]any{
 					"banned":     true,
 					"ban_reason": "Not in access group",
 				}).Error
