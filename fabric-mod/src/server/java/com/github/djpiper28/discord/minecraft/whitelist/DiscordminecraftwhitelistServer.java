@@ -42,30 +42,43 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var player = handler.getPlayer();
-            Discordminecraftwhitelist.LOGGER.info("Player {} joined the server", player.getName().getString());
+            final String playerName = player.getName().getString();
+            Discordminecraftwhitelist.LOGGER.info("Player {} joined the server", playerName);
+
+            String uuid;
+            try {
+                uuid = MojangAPI.getUuid(playerName);
+                if (uuid == null) {
+                    Discordminecraftwhitelist.LOGGER.warn("Could not fetch Mojang UUID for player {}, falling back to server-provided UUID", playerName);
+                    uuid = player.getUUID().toString();
+                }
+            } catch (Exception e) {
+                Discordminecraftwhitelist.LOGGER.error("Error fetching Mojang UUID for player {}", playerName, e);
+                uuid = player.getUUID().toString();
+            }
 
             try {
-                final var dbPlayer = database.getUser(player.getName().getString(), player.getId() + "");
+                final var dbPlayer = database.getUser(playerName, uuid);
 
                 if (!dbPlayer.getVerified()) {
-                    Discordminecraftwhitelist.LOGGER.info("Player {} is not verified - kicking with code", player.getName().getString());
+                    Discordminecraftwhitelist.LOGGER.info("Player {} is not verified - kicking with code", playerName);
                     player.connection.disconnect(Component.literal(String.format("To verify please use \"/mcverify %d\" in Discord", dbPlayer.getVerificationNumber())));
                     return;
                 }
 
                 if (dbPlayer.isBanned()) {
-                    Discordminecraftwhitelist.LOGGER.warn("Player {} is banned - {}", player.getName().getString(), dbPlayer.banReason());
+                    Discordminecraftwhitelist.LOGGER.warn("Player {} is banned - {}", playerName, dbPlayer.banReason());
                     player.connection.disconnect(Component.literal(String.format("You are banned; %s", dbPlayer.banReason())));
                     return;
                 }
 
-                Discordminecraftwhitelist.LOGGER.info("Player {} is allowed to join the server", player.getName().getString());
+                Discordminecraftwhitelist.LOGGER.info("Player {} is allowed to join the server", playerName);
             } catch (UserNotFoundException e) {
-                Discordminecraftwhitelist.LOGGER.info("Player {} is not added - kicking with instructions", player.getName().getString());
+                Discordminecraftwhitelist.LOGGER.info("Player {} is not added - kicking with instructions", playerName);
                 player.connection.disconnect(Component.literal("You have not registered in the Discord server, use /mcadd in the Discord server."));
                 return;
             } catch (SQLException e) {
-                Discordminecraftwhitelist.LOGGER.info("Cannot check player {} due to an error {}", player.getName().getString(), e.toString());
+                Discordminecraftwhitelist.LOGGER.info("Cannot check player {} due to an error {}", playerName, e.toString());
                 player.connection.disconnect(Component.literal(String.format("Cannot connect due to internal error %s. Please try again.", e.toString())));
                 return;
             }
@@ -81,7 +94,7 @@ public class DiscordminecraftwhitelistServer implements DedicatedServerModInitia
 
                 database.updateMinecraftUserLastAccessDetails(ip,
                         player.getX(), player.getY(), player.getZ(), player.serverLevel().dimension().location().getPath(),
-                        player.getId()+"");
+                        uuid);
             } catch (SQLException e) {
                 Discordminecraftwhitelist.LOGGER.warn("Could not update the last access information for the player", e);
             }
